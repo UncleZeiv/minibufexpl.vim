@@ -605,6 +605,11 @@ if !exists('g:miniBufExplForceDisplay')
   let g:miniBufExplForceDisplay = 0
 endif
 
+" Are we sorting the buffer list alphabetically or not
+if !exists('g:miniBufExplSortAlpha')
+  let g:miniBufExplSortAlpha = 1
+endif
+
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0 
 
@@ -705,6 +710,8 @@ function! <SID>StartExplorer(sticky, delBufNum)
   " The following allows for quicker moving between buffer
   " names in the [MBE] window it also saves the last-pattern
   " and restores it.
+  nnoremap <buffer> s :call <SID>ToggleSort()<CR>:<BS>
+
   nnoremap <buffer> <TAB>   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
  
@@ -774,6 +781,37 @@ function! <SID>ToggleExplorer()
   call <SID>DEBUG('Completed ToggleExplorer()' ,10)
   call <SID>DEBUG('===========================',10)
 
+endfunction
+
+" }}}
+" ToggleSort - Switches sorting on/off and updates the display {{{
+"
+function! <SID>ToggleSort()
+  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering ToggleSort()'      ,10)
+  call <SID>DEBUG('===========================',10)
+
+  let g:miniBufExplSortAlpha = !g:miniBufExplSortAlpha
+  let g:miniBufExplForceDisplay = 1
+
+  call <SID>DisplayBuffers(-1)
+
+  call <SID>AutoUpdate(-1)
+
+  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Completed ToggleSort()' ,10)
+  call <SID>DEBUG('===========================',10)
+
+endfunction
+
+" }}}
+" SortBuffers - Callback function to sort the buffer list {{{
+"
+function! <SID>SortBuffers(a, b)
+  let l:a = tolower(substitute(a:a, '^\[\d\+:', '', ''))
+  let l:b = tolower(substitute(a:b, '^\[\d\+:', '', ''))
+
+  return l:a == l:b ? 0 : l:a > l:b ? 1 : -1
 endfunction
 
 " }}}
@@ -1134,6 +1172,11 @@ function! <SID>BuildBufferList(delBufNum, updateBufList)
       endif
     endif
   endwhile
+
+  " Handle sorting
+  if g:miniBufExplSortAlpha == 1
+    call sort(l:fileNames, '<SID>SortBuffers')
+  endif
 
   if (g:miniBufExplBufList != l:fileNames)
     if (a:updateBufList)
