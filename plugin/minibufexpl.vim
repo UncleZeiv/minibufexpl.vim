@@ -223,6 +223,15 @@
 "               a buffer, the buffer should not show up in a window that is 
 "               hosting an explorer.
 "
+"               As of MBE 6.4.0, it is now possible to specify how the
+"               filename is displayed:
+"
+"                 let g:miniBufExplModifyFileName = ":t"
+"
+"               For instance, if you like to see the entire path to the file
+"               relative to your home, use ":.". For more options, see
+"               |filename-modifiers|.
+"
 "               There is a VIM bug that can cause buffers to show up without 
 "               their highlighting. The following setting will cause MBE to
 "               try and turn highlighting back on (introduced in 6.3.1):
@@ -559,6 +568,16 @@ if g:miniBufExplUseSingleClick == 1
     let  s:m = s:m . s:clickmap
     exec s:m
   endif
+endif
+
+" }}}
+" Change how filenames are displayed {{{
+" specify the parameter to be used with |fnamemodify|, see
+" |filename-modifiers|. The default value only shows the
+" basename of the file.
+"
+if !exists('g:miniBufExplModifyFileName')
+  let g:miniBufExplModifyFileName = ":t"
 endif " }}}
 
 " Variables used internally
@@ -692,7 +711,7 @@ function! <SID>StartExplorer(sticky, delBufNum)
   call <SID>DisplayBuffers(a:delBufNum)
 
   if (l:curBuf != -1)
-    call search('\['.l:curBuf.':'.expand('#'.l:curBuf.':t').'\]')
+    call search('\['.l:curBuf.':'.expand('#'.l:curBuf.g:miniBufExplModifyFileName).'\]')
   else
     call <SID>DEBUG('No current buffer to search for',9)
   endif
@@ -1084,7 +1103,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList)
           if (getbufvar(l:i, '&modifiable') == 1 && BufName != '-MiniBufExplorer-')
             
             " Get filename & Remove []'s & ()'s
-            let l:shortBufName = fnamemodify(l:BufName, ":t")                  
+            let l:shortBufName = fnamemodify(l:BufName, g:miniBufExplModifyFileName)
             let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
             let l:tab = '['.l:i.':'.l:shortBufName.']'
 
