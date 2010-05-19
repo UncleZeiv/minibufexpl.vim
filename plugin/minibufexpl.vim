@@ -586,7 +586,7 @@ endif " }}}
 " Global used to store the buffer list so we don't update the
 " UI unless the list has changed.
 if !exists('g:miniBufExplBufList')
-  let g:miniBufExplBufList = ''
+  let g:miniBufExplBufList = []
 endif
 
 " Variable used as a mutex so that we don't do lots
@@ -1044,7 +1044,17 @@ function! <SID>ShowBuffers(delBufNum)
     " Goto the end of the buffer put the buffer list 
     " and then delete the extra trailing blank line
     $
-    put! =g:miniBufExplBufList
+    " If horizontal and tab wrap is turned on we need to add spaces
+    if g:miniBufExplVSplit == 0
+      if g:miniBufExplTabWrap != 0
+        put! =join(g:miniBufExplBufList, ' ')
+      else
+        put! =join(g:miniBufExplBufList, '')
+      endif
+    " If not horizontal we print the list as is
+    else
+      put! =g:miniBufExplBufList
+    endif
     $ d _
 
     let g:miniBufExplForceDisplay = 0
@@ -1080,7 +1090,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList)
   let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
   let l:i = 0                     " Set the buffer index to zero.
 
-  let l:fileNames = ''
+  let l:fileNames = []
   let l:maxTabWidth = 0
 
   " Loop through every buffer less than the total number of buffers.
@@ -1118,17 +1128,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList)
             endif
 
             let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
-            let l:fileNames = l:fileNames.l:tab
-
-            " If horizontal and tab wrap is turned on we need to add spaces
-            if g:miniBufExplVSplit == 0
-              if g:miniBufExplTabWrap != 0
-                let l:fileNames = l:fileNames.' '
-              endif
-            " If not horizontal we need a newline
-            else
-              let l:fileNames = l:fileNames . "\n"
-            endif
+            call add(l:fileNames, l:tab)
           endif
         endif
       endif
