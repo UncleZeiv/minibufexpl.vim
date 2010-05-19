@@ -727,7 +727,7 @@ function! <SID>StartExplorer(sticky, delBufNum)
   call <SID>DisplayBuffers(a:delBufNum)
 
   if (l:curBuf != -1)
-    call search('\['.l:curBuf.':'.expand('#'.l:curBuf.g:miniBufExplModifyFileName).'\]')
+    call search('\[\s*'.l:curBuf.':'.expand('#'.l:curBuf.g:miniBufExplModifyFileName).'\]')
   else
     call <SID>DEBUG('No current buffer to search for',9)
   endif
@@ -817,8 +817,8 @@ endfunction
 " SortBuffers - Callback function to sort the buffer list {{{
 "
 function! <SID>SortBuffers(a, b)
-  let l:a = tolower(substitute(a:a, '^\[\d\+:', '', ''))
-  let l:b = tolower(substitute(a:b, '^\[\d\+:', '', ''))
+  let l:a = tolower(substitute(a:a, '^\[\s*\d\+:', '', ''))
+  let l:b = tolower(substitute(a:b, '^\[\s*\d\+:', '', ''))
 
   return l:a == l:b ? 0 : l:a > l:b ? 1 : -1
 endfunction
@@ -1158,11 +1158,17 @@ function! <SID>BuildBufferList(delBufNum, updateBufList)
           " Only show modifiable buffers (The idea is that we don't 
           " want to show Explorers)
           if (getbufvar(l:i, '&modifiable') == 1 && BufName != '-MiniBufExplorer-')
-            
+
             " Get filename & Remove []'s & ()'s
             let l:shortBufName = fnamemodify(l:BufName, g:miniBufExplModifyFileName)
             let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
-            let l:tab = '['.l:i.':'.l:shortBufName.']'
+            if g:miniBufExplVSplit == 0
+              let l:aligned = l:i
+            else
+              let l:idformat = printf('%%%dd',strlen(l:NBuffers))
+              let l:aligned = printf(l:idformat,l:i)
+            endif
+            let l:tab = '['.l:aligned.':'.l:shortBufName.']'
 
             " If the buffer is open in a window mark it
             if bufwinnr(l:i) != -1
@@ -1386,7 +1392,7 @@ function! <SID>GetSelectedBuffer()
   let @" = ""
   normal ""yi[
   if @" != ""
-    let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
+    let l:retv = substitute(@",'\s*\([0-9]*\):.*', '\1', '') + 0
     let @" = l:save_reg
     return l:retv
   else
