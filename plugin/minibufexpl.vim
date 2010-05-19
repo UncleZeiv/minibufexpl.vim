@@ -646,7 +646,9 @@ function! <SID>StartExplorer(sticky, delBufNum)
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
- 
+  setlocal nocursorline
+  setlocal nospell
+
   if has("syntax")
     syn clear
     syn match MBENormal             '\[[^\]]*\]'
