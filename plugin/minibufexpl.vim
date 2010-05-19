@@ -53,6 +53,7 @@
 "                 map <Leader>c :CMiniBufExplorer<cr>
 "                 map <Leader>u :UMiniBufExplorer<cr>
 "                 map <Leader>t :TMiniBufExplorer<cr>
+"                 map <Leader>s :SMiniBufExplorer<cr>
 "
 "               NOTE: you can change the key binding used in these mappings
 "                     so that they fit with your configuration of vim.
@@ -65,6 +66,7 @@
 "                 :UMiniBufExplorer   " Update Explorer without navigating
 "                 :TMiniBufExplorer   " Toggle the Explorer window open and 
 "                                       closed.
+"                 :SMiniBufExplorer   " Toggle alphabetical sort of buffers
 "
 "               To control where the new split window goes relative to the 
 "               current window, use the setting:
@@ -305,6 +307,9 @@ endif
 if !hasmapto('<Plug>TMiniBufExplorer')
   map <unique> <Leader>mbt <Plug>TMiniBufExplorer
 endif
+if !hasmapto('<Plug>SMiniBufExplorer')
+  map <unique> <Leader>mbs <Plug>SMiniBufExplorer
+endif
 
 " }}}
 " MBE <Script> internal map {{{
@@ -313,6 +318,7 @@ noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(1, -1)
 noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer(1)<CR>:<BS>
 noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1)<CR>:<BS>
 noremap <unique> <script> <Plug>TMiniBufExplorer :call <SID>ToggleExplorer()<CR>:<BS>
+noremap <unique> <script> <Plug>SMiniBufExplorer :call <SID>ToggleSort()<CR>:<BS>
 
 " }}}
 " MBE commands {{{
@@ -328,6 +334,9 @@ if !exists(':UMiniBufExplorer')
 endif
 if !exists(':TMiniBufExplorer')
   command! TMiniBufExplorer  call <SID>ToggleExplorer()
+endif
+if !exists(':SMiniBufExplorer')
+  command! SMiniBufExplorer  call <SID>ToggleSort()
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
