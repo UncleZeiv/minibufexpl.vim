@@ -1115,6 +1115,7 @@ function! <SID>ShowBuffers(delBufNum)
       put! =g:miniBufExplBufList
     endif
     $ d _
+    1
 
     let g:miniBufExplForceDisplay = 0
 
