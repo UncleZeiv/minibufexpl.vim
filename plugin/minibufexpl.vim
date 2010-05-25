@@ -215,6 +215,12 @@
 "               NOTE: If you set a colorscheme in your .vimrc you should do it
 "                     BEFORE updating the MBE highlighting groups.
 "
+"               As of MBE 6.4.0, it is now possible to call a custom function 
+"               to define additional pattern matches, e.g. to color selected 
+"               file types differently.
+"
+"                 let g:MiniBufExplDefineMatches = function("MyFunction")
+"
 "               If you use other explorers like TagList you can (As of 6.2.8) put:
 "
 "                 let g:miniBufExplModSelTarget = 1
@@ -696,6 +702,12 @@ function! <SID>StartExplorer(sticky, delBufNum)
       hi def link MBEVisibleNormal  Special
       hi def link MBEVisibleChanged Special
     endif
+
+  endif
+
+  if exists("g:MiniBufExplDefineMatches")
+    call clearmatches()
+    call g:MiniBufExplDefineMatches()
   endif
 
   " If you press return in the -MiniBufExplorer- then try
