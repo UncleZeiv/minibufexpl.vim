@@ -593,7 +593,16 @@ endif
 "
 if !exists('g:miniBufExplModifyFileName')
   let g:miniBufExplModifyFileName = ":t"
+endif
+
+" specify if buffer names are displayed with a header for all
+" files sharing the same directory. Works only in vertical
+" mode.
+"
+if !exists('g:miniBufExplGroupDirectories')
+  let g:miniBufExplGroupDirectories = 0
 endif " }}}
+
 
 " Variables used internally
 "
@@ -1112,7 +1121,27 @@ function! <SID>ShowBuffers(delBufNum)
       endif
     " If not horizontal we print the list as is
     else
-      put! =g:miniBufExplBufList
+      if g:miniBufExplGroupDirectories != 0
+        let l:maxTabWidth = 0
+        let l:currentDir = ''
+        for l:bname in g:miniBufExplBufList
+          let [l:bufid, l:bufname] = split(l:bname, '\[\|\][^[]*\|:')
+          let l:thisDir = fnamemodify(l:bufname, ':h')
+          if l:thisDir != l:currentDir
+            let l:maxTabWidth = <SID>Max(strlen(l:thisDir) + 1, l:maxTabWidth)
+            put! =l:thisDir.'/'
+            normal j
+            let l:currentDir = l:thisDir
+          endif
+          let l:line = '['.l:bufid.':'.fnamemodify(l:bufname, ':t').']'
+          let l:maxTabWidth = <SID>Max(strlen(l:line), l:maxTabWidth)
+          put! =l:line
+          normal j
+        endfor
+        let s:maxTabWidth = l:maxTabWidth
+      else
+        put! =g:miniBufExplBufList
+      endif
     endif
     $ d _
     1
