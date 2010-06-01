@@ -742,8 +742,8 @@ function! <SID>StartExplorer(sticky, delBufNum)
   " and restores it.
   nnoremap <buffer> s :call <SID>ToggleSort()<CR>:<BS>
 
-  nnoremap <buffer> <TAB>   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  nnoremap <buffer> <TAB>   :call search('\[\s*[0-9]\+:[^\]]*\]')<CR>:<BS>
+  nnoremap <buffer> <S-TAB> :call search('\[\s*[0-9]\+:[^\]]*\]','b')<CR>:<BS>
  
   call <SID>DisplayBuffers(a:delBufNum)
 
