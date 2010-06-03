@@ -1133,7 +1133,8 @@ function! <SID>ShowBuffers(delBufNum)
             normal j
             let l:currentDir = l:thisDir
           endif
-          let l:line = '['.l:bufid.':'.fnamemodify(l:bufname, ':t').']'
+          let l:trail = l:bname[match(l:bname, '][^\]]*$'):]
+          let l:line = '['.l:bufid.':'.fnamemodify(l:bufname, ':t').l:trail
           let l:maxTabWidth = <SID>Max(strlen(l:line), l:maxTabWidth)
           put! =l:line
           normal j
