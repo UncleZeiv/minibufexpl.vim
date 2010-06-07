@@ -601,6 +601,9 @@ endif
 "
 if !exists('g:miniBufExplGroupDirectories')
   let g:miniBufExplGroupDirectories = 0
+endif
+if !exists('g:miniBufExplDirSubs')
+  let g:miniBufExplDirSubs = []
 endif " }}}
 
 
@@ -1128,8 +1131,13 @@ function! <SID>ShowBuffers(delBufNum)
           let [l:bufid, l:bufname] = split(l:bname, '\[\|\][^[]*\|:')
           let l:thisDir = fnamemodify(l:bufname, ':h')
           if l:thisDir != l:currentDir
-            let l:maxTabWidth = <SID>Max(strlen(l:thisDir) + 1, l:maxTabWidth)
-            put! =l:thisDir.'/'
+            let l:printDir = l:thisDir
+            for l:subexpr in g:miniBufExplDirSubs
+              let [l:pat, l:sub] = split(l:subexpr, '\(\\\)\@<!'.l:subexpr[0])
+              let l:printDir = substitute(l:printDir, l:pat, l:sub, 'g')
+            endfor
+            put! =l:printDir.'/'
+            let l:maxTabWidth = <SID>Max(strlen(l:printDir) + 1, l:maxTabWidth)
             normal j
             let l:currentDir = l:thisDir
           endif
