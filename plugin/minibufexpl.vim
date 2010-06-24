@@ -841,8 +841,23 @@ endfunction
 " SortBuffers - Callback function to sort the buffer list {{{
 "
 function! <SID>SortBuffers(a, b)
+  " remove buffer number
   let l:a = tolower(substitute(a:a, '^\[\s*\d\+:', '', ''))
   let l:b = tolower(substitute(a:b, '^\[\s*\d\+:', '', ''))
+
+  " handle path sorting so that subdirectories always come last
+  let l:aBase = fnamemodify( l:a, ':h' )
+  let l:bBase = fnamemodify( l:b, ':h' )
+
+  let l:aLen = strlen(l:aBase) - 1
+  let l:bLen = strlen(l:bBase) - 1
+
+  if l:aLen != l:bLen
+    let l:minLen = min([l:aLen, l:bLen])
+    if l:aBase[:l:minLen] == l:bBase[:l:minLen]
+      return l:minLen == l:aLen ? -1 : 1
+    endif
+  endif
 
   return l:a == l:b ? 0 : l:a > l:b ? 1 : -1
 endfunction
