@@ -325,6 +325,7 @@ noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer(1)<CR>:
 noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1)<CR>:<BS>
 noremap <unique> <script> <Plug>TMiniBufExplorer :call <SID>ToggleExplorer()<CR>:<BS>
 noremap <unique> <script> <Plug>SMiniBufExplorer :call <SID>ToggleSort()<CR>:<BS>
+noremap <unique> <script> <Plug>LMiniBufExplorer :call <SID>ToggleLoaded()<CR>:<BS>
 
 " }}}
 " MBE commands {{{
@@ -343,6 +344,9 @@ if !exists(':TMiniBufExplorer')
 endif
 if !exists(':SMiniBufExplorer')
   command! SMiniBufExplorer  call <SID>ToggleSort()
+endif
+if !exists(':LMiniBufExplorer')
+  command! LMiniBufExplorer  call <SID>ToggleLoaded()
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
@@ -460,6 +464,16 @@ endif
 "
 if !exists('g:miniBufExplVSplit')
   let g:miniBufExplVSplit = 0
+endif
+
+" }}}
+" ShowLoaded? {{{
+" Show only loaded buffers (i.e. active or hidden) or also unloaded ones. 
+" Useful when you open an entire tree of files but are just working on a few of 
+" them.
+"
+if !exists('g:miniBufExplShowLoaded')
+  let g:miniBufExplShowLoaded = 0
 endif
 
 " }}}
@@ -744,6 +758,7 @@ function! <SID>StartExplorer(sticky, delBufNum)
   " names in the [MBE] window it also saves the last-pattern
   " and restores it.
   nnoremap <buffer> s :call <SID>ToggleSort()<CR>:<BS>
+  nnoremap <buffer> l :call <SID>ToggleLoaded()<CR>:<BS>
 
   nnoremap <buffer> <TAB>   :call search('\[\s*[0-9]\+:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> <S-TAB> :call search('\[\s*[0-9]\+:[^\]]*\]','b')<CR>:<BS>
@@ -833,6 +848,26 @@ function! <SID>ToggleSort()
 
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Completed ToggleSort()' ,10)
+  call <SID>DEBUG('===========================',10)
+
+endfunction
+
+" }}}
+" ToggleLoaded - Switches showing only loaded buffers on/off and updates the display {{{
+"
+function! <SID>ToggleLoaded()
+  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering ToggleLoaded()'    ,10)
+  call <SID>DEBUG('===========================',10)
+
+  let g:miniBufExplShowLoaded = !g:miniBufExplShowLoaded
+  let g:miniBufExplForceDisplay = 1
+
+  call <SID>DisplayBuffers(-1)
+  call <SID>AutoUpdate(-1)
+
+  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Completed ToggleLoaded()'   ,10)
   call <SID>DEBUG('===========================',10)
 
 endfunction
@@ -1224,6 +1259,10 @@ function! <SID>BuildBufferList(delBufNum, updateBufList)
           " Only show modifiable buffers (The idea is that we don't 
           " want to show Explorers)
           if (getbufvar(l:i, '&modifiable') == 1 && BufName != '-MiniBufExplorer-')
+
+            if g:miniBufExplShowLoaded == 1 && (bufloaded(l:i) == 0)
+              continue
+            endif
 
             " Get filename & Remove []'s & ()'s
             let l:shortBufName = fnamemodify(l:BufName, g:miniBufExplModifyFileName)
