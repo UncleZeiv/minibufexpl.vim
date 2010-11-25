@@ -889,7 +889,7 @@ function! <SID>SortBuffers(a, b)
 
   if l:aLen != l:bLen
     let l:minLen = min([l:aLen, l:bLen])
-    if l:aBase[:l:minLen] == l:bBase[:l:minLen]
+    if l:aBase[:l:minLen] == l:bBase[:l:minLen] || l:minLen == 0
       return l:minLen == l:aLen ? -1 : 1
     endif
   endif
