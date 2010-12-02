@@ -766,7 +766,7 @@ function! <SID>StartExplorer(sticky, delBufNum)
   call <SID>DisplayBuffers(a:delBufNum)
 
   if (l:curBuf != -1)
-    call search('\V\[\s*'.l:curBuf.':'.escape(expand('#'.l:curBuf.g:miniBufExplModifyFileName), '\').'\]')
+    call search('\V[\s\*'.l:curBuf.':')
   else
     call <SID>DEBUG('No current buffer to search for',9)
   endif
