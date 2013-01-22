@@ -800,6 +800,8 @@ function! <SID>StopExplorer(sticky)
     wincmd p
   endif
 
+  call clearmatches()
+
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Completed StopExplorer()'   ,10)
   call <SID>DEBUG('===========================',10)
