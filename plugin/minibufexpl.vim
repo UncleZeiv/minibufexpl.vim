@@ -1049,8 +1049,11 @@ function! <SID>DisplayBuffers(delBufNum)
   " We need to be able to modify the buffer
   setlocal modifiable
 
+  let l:curLine = line('.')
+  let l:curCol = virtcol('.')
   call <SID>ShowBuffers(a:delBufNum)
   call <SID>ResizeWindow()
+  call cursor(l:curLine, l:curCol)
   
   normal! zz
   
@@ -1562,6 +1565,7 @@ function! <SID>MBESelectBuffer()
       resize
     endif
     let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
+
     call <SID>AutoUpdate(-1)
 
   endif
